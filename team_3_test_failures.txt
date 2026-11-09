@@ -1,0 +1,78 @@
+﻿python : ....................................................................................................................................
+........................................................................................................................
+At line:1 char:1
++ python -m unittest discover 2>&1 | Out-File -FilePath team_3_test_fai ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (.................................:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+----------------------------------------------------------------------
+Ran 252 tests in 0.650s
+
+OK
+No --label given, using the default `kind/bug`.
+
+========================================================================
+FirstReporterAnalysis
+========================================================================
+Question: Within `kind/bug`, are issues from first-time reporters resolved differently depending on how much of their description is pasted code?
+Method:   A first-time reporter had no earlier activity (issue created, or a commented, labeled, closed event) before opening the issue. Code share is measured on the `### Description` section only; issues without that section (old checkbox template) are left out. Issues are grouped into no code (share 0), top 10% (at or above the 90th percentile of non-zero shares, ties included) and middle (the rest), then compared on median time to close (closed issues only, last close event), median comments, duplicate and needs-reproduction rates (current labels), and who closed them.
+
+Found 1 issues from first-time reporters out of 1 issues labeled `kind/bug`.
+Left out 1 issues without a `### Description` section.
+
++---------+-----+----------+-------------+-----------------+----------------+-------------------------+-----------+------------+-----------+
+| group   | n   | n closed | median days | median comments | duplicate rate | needs-reproduction rate | closed by |  closed by | closed by |
+|         |     |          |    to close |                 |                |                         |  reporter | maintainer |     other |
++=========+=====+==========+=============+=================+================+=========================+===========+============+===========+
+| no code | n=0 |        0 |           - |               - |              - |                       - |         - |          - |         - |
++---------+-----+----------+-------------+-----------------+----------------+-------------------------+-----------+------------+-----------+
+| middle  | n=0 |        0 |           - |               - |              - |                       - |         - |          - |         - |
++---------+-----+----------+-------------+-----------------+----------------+-------------------------+-----------+------------+-----------+
+| top 10% | n=0 |        0 |           - |               - |              - |                       - |         - |          - |         - |
++---------+-----+----------+-------------+-----------------+----------------+-------------------------+-----------+------------+-----------+
+
+Warning: fewer than 10 issues in no code (n=0), middle (n=0), top 10% (n=0); treat those numbers as anecdotal.
+
+Finding: Can't compare: the no-code group has n=0 and the top 10% group has n=0.
+========================================================================
+
+No issues to group in `kind/bug`, so there is no chart.
+Label `nonexistent` was not found in the data. Available labels:
+  kind/bug
+No --label given, using the default `kind/bug`.
+Found 2 issues from first-time reporters out of 2 issues labeled `kind/bug`.
+Left out 0 issues without a `### Description` section.
+Top group cutoff: code share >= 0.562
+
+Warning: fewer than 10 issues in no code (n=1), middle (n=0), top 10% (n=1); treat those numbers as anecdotal.
+
+No issue in the related set has a creation date, so there is no chart.
+Issue #1: Title
+Found 1 related issues: 0 outgoing, 0 incoming, 1 both.
+
+Columns:
+  issue            issue number
+  link             target, or how the issue relates to it: outgoing (the target references it), incoming (it references the target) or both
+  state            open or closed
+  refs             titles, bodies and comments that link the issue and the target (for the target, all of them)
+  first ref        date of the earliest of those references
+  days to close    days from creation to the close; "open" if still open, "closed, date unknown" if closed but the data has no close date (it keeps only the first 30 events of each issue)
+  ref to close     days from the first ref to the close, negative when the reference came after the close; "n/a" when either date is missing
+  people           distinct commenters
+  reporter/maint.  how many of those commenters are the reporter or a maintainer
+  title            issue title
+
+Issue #1: Title
+Quarterly code share (quarters with fewer than 20 issues are left out):
++---------+--------+----+----------------------+-------------------+
+| quarter | period |  n | reporter text median | whole body median |
++=========+========+====+======================+===================+
+| 2026Q1  | before | 20 |                 0.00 |                 - |
++---------+--------+----+----------------------+-------------------+
+| 2026Q1  | after  | 20 |                 0.00 |              0.00 |
++---------+--------+----+----------------------+-------------------+
+
+Switch date: 2026-01-02 00:00 UTC
+Form check: 2 of 2 issues created since then (100.0%) use the form; the other 0 are left out of the after period.
+
