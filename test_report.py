@@ -43,7 +43,13 @@ class TestReport(unittest.TestCase):
             self.assertIn(item, output)
 
     def test_print_table_empty_rows(self):
-        output = self.capture(report.print_table, ['name', 'count'], [])
+        try:
+            output = self.capture(report.print_table, ['name', 'count'], [])
+        except IndexError as error:
+            self.fail(
+                "print_table() raises IndexError for an empty row list: "
+                + str(error)
+            )
         self.assertIn('name', output)
         self.assertIn('count', output)
 

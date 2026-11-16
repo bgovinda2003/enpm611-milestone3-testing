@@ -22,8 +22,8 @@ A command-line application that analyzes the GitHub issues of the [Poetry](https
 Clone the repository and navigate into it:
 
 ```
-git clone git@github.com:mdevhurt1/project-application-template.git
-cd project-application-template
+git clone git@github.com:bgovinda2003/enpm611-milestone3-testing.git
+cd enpm611-milestone3-testing
 ```
 
 Create and activate a virtual environment, then install the dependencies:
@@ -33,6 +33,24 @@ python3 -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
+
+## Testing
+
+From the repository root, with the virtual environment active:
+
+```
+python -m unittest discover
+```
+
+Statement coverage (requires the `coverage` package):
+
+```
+pip install coverage
+coverage run -m unittest discover
+coverage report
+```
+
+`.coveragerc` excludes test modules from the coverage total. Two tests are expected to fail on the unfixed production code: `test_get_falsy_numeric_default` and `test_print_table_empty_rows`.
 
 ## Dataset
 

@@ -79,6 +79,15 @@ class TestConfig(unittest.TestCase):
             "fallback"
         )
 
+    def test_get_falsy_numeric_default(self):
+        # A default of 0 is a valid value and should be returned when
+        # the key is absent. The implementation currently treats any
+        # falsy default as "no default" and returns None instead.
+        self.assertEqual(
+            config.get_parameter("ENPM611_MISSING_TEST_KEY", 0),
+            0
+        )
+
     def test_environment_overrides_config(self):
         config._config = {"ENPM611_TEST_KEY": "file_value"}
         with patch.dict(
@@ -179,7 +188,9 @@ class TestConfig(unittest.TestCase):
             with patch.object(os, "getcwd", return_value=directory):
                 result = config._get_default_path()
 
-            self.assertEqual(result, str(path.resolve()))
+            # Match production code, which uses os.path.abspath rather
+            # than Path.resolve(). On macOS those differ by a /private prefix.
+            self.assertEqual(result, os.path.abspath(str(path)))
 
     def test_find_config_in_parent_directory(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -192,7 +203,14 @@ class TestConfig(unittest.TestCase):
             with patch.object(os, "getcwd", return_value=str(child)):
                 result = config._get_default_path()
 
-            self.assertEqual(result, str(path.resolve()))
+            self.assertEqual(result, os.path.abspath(str(path)))
+
+    def test_find_config_when_missing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with patch.object(os, "getcwd", return_value=directory):
+                result = config._get_default_path()
+
+        self.assertIsNone(result)
 
 
 if __name__ == "__main__":

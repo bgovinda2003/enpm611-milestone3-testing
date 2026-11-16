@@ -1,8 +1,12 @@
 
+import io
 import unittest
+from contextlib import redirect_stdout
 from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
 
+import matplotlib
+matplotlib.use("Agg")
 import pandas as pd
 
 import template_switch_analysis as feature
@@ -288,7 +292,7 @@ class TestTemplateSwitchAnalysis(unittest.TestCase):
                     with patch.object(feature, "print_finding") as finding:
                         with patch.object(
                             self.analysis, "plot_quarterly_code_share"
-                        ) as plot:
+                        ) as plot, redirect_stdout(io.StringIO()):
                             self.analysis.run()
 
         intro.assert_called_once()
@@ -297,6 +301,31 @@ class TestTemplateSwitchAnalysis(unittest.TestCase):
         plot.assert_called_once_with(
             issues, self.base + timedelta(days=1)
         )
+
+    def test_run_reports_pre_switch_form_outliers(self):
+        issues = [
+            self.issue(1, 0, form=True),
+            self.issue(2, 1, form=False),
+            self.issue(3, 2, form=False),
+            self.issue(4, 3, form=True),
+            self.issue(5, 4, form=True)
+        ]
+        captured = io.StringIO()
+
+        with patch.object(
+            feature.DataLoader, "get_issues",
+            return_value=issues
+        ), patch.object(feature, "print_intro"), \
+             patch.object(feature, "print_table"), \
+             patch.object(feature, "print_finding"), \
+             patch.object(
+                 self.analysis, "plot_quarterly_code_share"
+             ), redirect_stdout(captured):
+            self.analysis.run()
+
+        output = captured.getvalue()
+        self.assertIn("Outliers before the switch", output)
+        self.assertIn("#1", output)
 
     # Chart generation with mocked file saving
 
@@ -311,7 +340,8 @@ class TestTemplateSwitchAnalysis(unittest.TestCase):
 
         switch_date = self.base + timedelta(days=21)
 
-        with patch.object(feature, "save_chart") as save:
+        with patch.object(feature, "save_chart") as save, \
+             redirect_stdout(io.StringIO()):
             try:
                 self.analysis.plot_quarterly_code_share(
                     issues, switch_date
@@ -321,6 +351,30 @@ class TestTemplateSwitchAnalysis(unittest.TestCase):
                     save.call_args.args[1],
                     feature.CHART_PATH
                 )
+            finally:
+                feature.plt.close("all")
+
+    def test_plot_quarterly_skips_undated_and_non_form_after(self):
+        issues = [
+            self.issue(i, i, form=False)
+            for i in range(1, 21)
+        ] + [
+            self.issue(i, i, form=True)
+            for i in range(21, 41)
+        ] + [
+            self.issue(100, 0, form=False, created=False),
+            self.issue(101, 30, form=False)
+        ]
+
+        switch_date = self.base + timedelta(days=21)
+
+        with patch.object(feature, "save_chart") as save, \
+             redirect_stdout(io.StringIO()):
+            try:
+                self.analysis.plot_quarterly_code_share(
+                    issues, switch_date
+                )
+                save.assert_called_once()
             finally:
                 feature.plt.close("all")
 

@@ -1,7 +1,12 @@
 
+import io
 import unittest
+from contextlib import redirect_stdout
 from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
+
+import matplotlib
+matplotlib.use("Agg")
 
 import first_reporter_code_share_analysis as feature
 from model import Issue
@@ -291,7 +296,8 @@ class TestFirstReporterAnalysis(unittest.TestCase):
 
         with patch.object(
             feature.DataLoader, "get_issues", return_value=issues
-        ), patch.object(feature, "print_intro") as intro:
+        ), patch.object(feature, "print_intro") as intro, \
+             redirect_stdout(io.StringIO()):
             self.analysis.run()
 
         intro.assert_not_called()
@@ -303,7 +309,7 @@ class TestFirstReporterAnalysis(unittest.TestCase):
             feature.DataLoader, "get_issues", return_value=issues
         ), patch.object(
             self.analysis, "plot_groups"
-        ) as plot:
+        ) as plot, redirect_stdout(io.StringIO()):
             self.analysis.run()
 
         plot.assert_not_called()
@@ -327,7 +333,7 @@ class TestFirstReporterAnalysis(unittest.TestCase):
             feature, "print_finding"
         ), patch.object(
             self.analysis, "plot_groups"
-        ) as plot:
+        ) as plot, redirect_stdout(io.StringIO()):
             self.analysis.run()
 
         plot.assert_called_once()
@@ -341,7 +347,8 @@ class TestFirstReporterAnalysis(unittest.TestCase):
             "top 10%": self.sample_stats(3, 2, 1, 0.1, 1)
         }
 
-        with patch.object(feature, "save_chart") as save:
+        with patch.object(feature, "save_chart") as save, \
+             redirect_stdout(io.StringIO()):
             try:
                 self.analysis.plot_groups("kind/bug", stats)
                 save.assert_called_once()

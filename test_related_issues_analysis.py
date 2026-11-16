@@ -1,6 +1,11 @@
+import io
 import unittest
+from contextlib import redirect_stdout
 from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
+
+import matplotlib
+matplotlib.use("Agg")
 
 import related_issues_analysis as feature
 from model import Issue
@@ -154,7 +159,8 @@ class TestAnalysis(unittest.TestCase):
         with patch.object(feature.DataLoader, 'get_issues', return_value=[make_issue(1)]), \
              patch.object(feature, 'print_intro'), \
              patch.object(feature, 'print_finding') as finding, \
-             patch.object(self.analysis, 'plot') as plot:
+             patch.object(self.analysis, 'plot') as plot, \
+             redirect_stdout(io.StringIO()):
             self.analysis.run()
         finding.assert_called_once()
         plot.assert_not_called()
@@ -165,7 +171,8 @@ class TestAnalysis(unittest.TestCase):
              patch.object(feature, 'print_intro') as intro, \
              patch.object(feature, 'print_table') as table, \
              patch.object(feature, 'print_finding') as finding, \
-             patch.object(self.analysis, 'plot') as plot:
+             patch.object(self.analysis, 'plot') as plot, \
+             redirect_stdout(io.StringIO()):
             self.analysis.run()
         intro.assert_called_once()
         table.assert_called_once()
@@ -208,9 +215,19 @@ class TestAnalysis(unittest.TestCase):
             {2: related_issue})
         self.assertIn('median time to close', text)
 
+    def test_finding_related_unknown_close_date(self):
+        target = make_issue(1)
+        related_issue = make_issue(2, state='closed')
+        text = self.analysis.finding(
+            target, {'time_to_close': None}, {2: feature.INCOMING},
+            {2: {'time_to_close': None, 'ref_to_close': None}},
+            {2: related_issue})
+        self.assertIn('closed with an unknown close date', text)
+
     def test_plot_no_dated_issues(self):
         target = make_issue(1, dated=False)
-        with patch.object(feature, 'save_chart') as save:
+        with patch.object(feature, 'save_chart') as save, \
+             redirect_stdout(io.StringIO()):
             self.analysis.plot(target, {'first_ref': None}, {}, {}, {}, None)
         save.assert_not_called()
 
@@ -221,7 +238,8 @@ class TestAnalysis(unittest.TestCase):
         related = {2: feature.OUTGOING}
         stats = {2: {'first_ref': BASE + timedelta(days=2),
                      'time_to_close': timedelta(days=3)}}
-        with patch.object(feature, 'save_chart') as save:
+        with patch.object(feature, 'save_chart') as save, \
+             redirect_stdout(io.StringIO()):
             try:
                 self.analysis.plot(target, {'first_ref': BASE}, related,
                                    stats, {2: closed}, BASE + timedelta(days=5))
@@ -232,10 +250,29 @@ class TestAnalysis(unittest.TestCase):
 
     def test_plot_unknown_closed_date(self):
         target = make_issue(1, state='closed')
-        with patch.object(feature, 'save_chart') as save:
+        with patch.object(feature, 'save_chart') as save, \
+             redirect_stdout(io.StringIO()):
             try:
                 self.analysis.plot(target, {'first_ref': None}, {}, {}, {}, BASE)
                 save.assert_called_once()
+            finally:
+                feature.plt.close('all')
+
+    def test_plot_closed_target_draws_close_line(self):
+        target = make_issue(1, state='closed', events=[event(kind='closed', day=3)])
+        related_issue = make_issue(2, day=1)
+        related = {2: feature.INCOMING}
+        stats = {2: {'first_ref': BASE + timedelta(days=1), 'time_to_close': None}}
+        with patch.object(feature, 'save_chart') as save, \
+             redirect_stdout(io.StringIO()):
+            try:
+                self.analysis.plot(
+                    target,
+                    {'first_ref': BASE, 'time_to_close': timedelta(days=3)},
+                    related, stats, {2: related_issue},
+                    BASE + timedelta(days=5))
+                save.assert_called_once()
+                self.assertEqual(save.call_args.args[1], feature.CHART_PATH)
             finally:
                 feature.plt.close('all')
 
