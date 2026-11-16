@@ -1,0 +1,11 @@
+[run]
+source = .
+omit =
+    test_*.py
+    */test_*.py
+    tests/*
+    .venv/*
+    */site-packages/*
+
+[report]
+show_missing = False

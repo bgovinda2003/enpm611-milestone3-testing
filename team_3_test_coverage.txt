@@ -1,0 +1,14 @@
+Name                                    Stmts   Miss  Cover
+-----------------------------------------------------------
+config.py                                  67      2    97%
+data_loader.py                             22      1    95%
+example_analysis.py                        28      1    96%
+first_reporter_code_share_analysis.py     141      1    99%
+issue_metrics.py                          124      0   100%
+model.py                                   63      0   100%
+related_issues_analysis.py                206      1    99%
+report.py                                  52      0   100%
+run.py                                     26      0   100%
+template_switch_analysis.py                96      1    99%
+-----------------------------------------------------------
+TOTAL                                     825      7    99%

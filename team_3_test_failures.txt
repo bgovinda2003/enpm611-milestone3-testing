@@ -1,0 +1,28 @@
+..............F...................................................................................................................................................................................................F...............................................
+======================================================================
+FAIL: test_get_falsy_numeric_default (test_config.TestConfig)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/bhargav/enpm611-milestone3-testing/test_config.py", line 86, in test_get_falsy_numeric_default
+    self.assertEqual(
+AssertionError: None != 0
+
+======================================================================
+FAIL: test_print_table_empty_rows (test_report.TestReport)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/bhargav/enpm611-milestone3-testing/test_report.py", line 47, in test_print_table_empty_rows
+    output = self.capture(report.print_table, ['name', 'count'], [])
+IndexError: list index out of range
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/bhargav/enpm611-milestone3-testing/test_report.py", line 49, in test_print_table_empty_rows
+    self.fail(
+AssertionError: print_table() raises IndexError for an empty row list: list index out of range
+
+----------------------------------------------------------------------
+Ran 258 tests in 0.468s
+
+FAILED (failures=2)
